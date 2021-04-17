@@ -13,8 +13,32 @@
 #include <signal.h>
 
 
-int main()
+int main(int argc, char *argv[])
 {
+  //char check[100];
+
+  //the killer
+  if(argc != 2 || argv[1][1] != "-z" & argv[1][1] != "-x")
+  {
+    printf("There are only -z and -x\n");
+  }
+
+  else if (argc == 2)
+  {
+    FILE *kill = fopen("kill.sh", "w");
+    if(argv[1][1] == "-z")
+    {
+          fprintf(kill,"#!/bin/bash\nkillall -9 /Users/evelynsierra/ITS/Semester_4/Sisop/soal3/soal-shift-sisop-modul-2-B04-2021/soal3/soal3.c");
+          //fputs(perintah_kill, kill);
+          fclose(kill);
+        //strcpy(check, "#!/bin/bash")
+    }
+    else if(argv[1][1] == "-x")
+    {
+      fprintf(kill,"#!/bin/bash\nkill %s /Users/evelynsierra/ITS/Semester_4/Sisop/soal3/soal-shift-sisop-modul-2-B04-2021/soal3/soal3.c", getpid());
+      fclose(kill);
+    }
+  }
 
   while(1)
   {
