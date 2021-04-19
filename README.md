@@ -23,13 +23,15 @@ Note:
 - Tidak boleh menggunakan fungsi system(), mkdir(), dan rename() (Yang di bahasa C) .... FORBIDDENNN!!
 - Tidak boleh pake cron !!!
 - Menggunakan fork dan exec.
-- Link :
+
+Link :
   - Foto : https://drive.google.com/file/d/1FsrAzb9B5ixooGUs0dGiBr-rC7TS9wTD/view
   - Musik : https://drive.google.com/file/d/1ZG8nRBRPquhYXq_sISdsVcXx5VdEgi-J/view
   - Film : https://drive.google.com/file/d/1ktjGgDkL0nNpY-vT7rT7O6ZI47Ke9xcp/view
+
 Tips :
 - Gunakan fungsi wait() dan sleep() untuk memperlancarrr..
-- untuk mendownload zip yang dibutuhkan bisa menggunakan command : wget --no-check-certificate "https://drive.google.com/uc?id=ID-FILE&export=download" -O Nama_untuk_filenya.ext
+- Untuk mendownload zip yang dibutuhkan bisa menggunakan command : wget --no-check-certificate "https://drive.google.com/uc?id=ID-FILE&export=download" -O Nama_untuk_filenya.ext
 
 **Pertama-tama, inisiasi link dan nama-nama folder/file sebagai berikut :**
 ``` c
@@ -87,7 +89,8 @@ int main() {
     }sleep(1);
 }
 ```
-Nah, loop utama di atas mengandung **pengecekan waktu sekarang apakahsama dengan request soal**. Waktu yang pertama adalah 6 jam sebelum waktu ulang tahun Stevany yaitu pada 9 April jam 16:22:00. Lalu dipanggillah `fungsi1()` yang berisi :
+Nah, loop utama di atas mengandung pengecekan waktu sekarang apakah sama dengan request soal.
+Waktu yang pertama adalah 6 jam sebelum waktu ulang tahun Stevany yaitu pada 9 April jam 16:22:00 **(e)**. Lalu dipanggillah `fungsi1()` yang berisi :
 ``` c
 void fungsi1(){
     pid_t lala = fork();
@@ -214,21 +217,21 @@ void fungsi1(){
 }
 ```
 **Fungsi di atas memerlukan banyak fork yang sudah mencakup :**
-a. Membuat folder `Musyik`, `Fylm`, dan `Pyoto`
-b. Mendownload file-file zip dari link yang telah disediakan
-c. Ekstrak file-file zip tersebut 
-d. Memindahkan file-file yang ada dalam folder hasil ekstrak zip
+- Membuat folder `Musyik`, `Fylm`, dan `Pyoto` **(a)**
+- Mendownload file-file zip dari link yang telah disediakan **(b)**
+- Ekstrak file-file zip tersebut **(c)**
+- Memindahkan file-file yang ada dalam folder hasil ekstrak zip **(d)**
 
 **Penjelasannya sebagai berikut :**
-a. Membuat folder `Musyik`, `Fylm`, dan `Pyoto`
+- Membuat folder `Musyik`, `Fylm`, dan `Pyoto` **(a)**
 ``` c
 char *argv[]={"mkdir","-p",dir[0], dir[1], dir[2], NULL};
 execv("/usr/bin/mkdir",argv);
 ```
 Jadi `mkdir` digunakan untuk membuat folder, `-q` adalah quiet, dir[0], dir[1], dan dir[2] adalah `char *dir[] = {"Musyik","Fylm","Pyoto"};`
 
-b. Mendownload file-file zip dari link yang telah disediakan
-c. Ekstrak file-file zip tersebut 
+- Mendownload file-file zip dari link yang telah disediakan **(b)**
+- Ekstrak file-file zip tersebut **(c)**
 ``` c
 pid_t ch4 = fork();
 int status4;
@@ -249,7 +252,7 @@ Untuk mendownload lalu mengekstrak diperlukan fork dimana child yang berfungsi u
 Jadi untuk mendownload file dari drive menggunakan `wget`, `--no-check-certificate`, `drive[0]` merupakan sumber link, `-O` untuk rename nama file, dan `nama[0]` yang merupakan nama yang diinginkan untuk rename, sedangkan `-q` adalah quiet. 
 Implementasi di atas merupakan implementai untuk musik/mp3, untuk yang lainnya hanya menyesuaikan link, nama, dan penempatan forknya.
 
-d. Memindahkan file-file yang ada dalam folder hasil ekstrak zip
+- Memindahkan file-file yang ada dalam folder hasil ekstrak zip **(d)**
 ```
 char *argv[] = {"find", "/home/zo/Documents/sisop/m2/MUSIK", "-type","f","-exec","mv","{}","/home/zo/Documents/sisop/m2/Musyik",";", NULL};
 execv("/usr/bin/find", argv);
@@ -289,7 +292,7 @@ void fungsi2(){
     }
 }
 ```
-Untuk mengerjakan soal f tersebut digunakan fork() dimana child diisi dengan proses zipping dan parent diisi dengan menghapus folder kosong
+Untuk mengerjakan soal **(f)** tersebut digunakan fork() dimana child diisi dengan proses zipping dan parent diisi dengan menghapus folder kosong
 
 **Penjelasannya sebagai berikut :**
 - Zipping
