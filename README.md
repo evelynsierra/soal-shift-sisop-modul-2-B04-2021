@@ -31,7 +31,7 @@ Link :
 
 Tips :
 - Gunakan fungsi wait() dan sleep() untuk memperlancarrr..
-- Untuk mendownload zip yang dibutuhkan bisa menggunakan command : wget --no-check-certificate "https://drive.google.com/uc?id=ID-FILE&export=download" -O Nama_untuk_filenya.ext
+- Untuk mendownload zip yang dibutuhkan bisa menggunakan command : `wget --no-check-certificate "https://drive.google.com/uc?id=ID-FILE&export=download" -O Nama_untuk_filenya.ext`
 
 **Pertama-tama, inisiasi link dan nama-nama folder/file sebagai berikut :**
 ``` c
