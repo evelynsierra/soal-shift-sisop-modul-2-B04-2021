@@ -316,6 +316,20 @@ Digunakan `rm` dan `-r` untuk format menghapus folder dengan nama `empty[0]`, `e
 
 
 ## Soal 2
+Untuk mengerjakan nomor 2 kita harus mengunduh file zip pada link berikut https://drive.google.com/file/d/1g5rehatLEkqvuuK_eooHJXB57EfdnxVD/view?usp=sharing
+Pada soal ini kita diperintahkan untuk menolong Loba dalam mengolah foto-foto hewan peliharaan dalam folder miliknya. 
+(a) Pertama-tama program perlu mengextract zip yang diberikan ke dalam folder “/home/[user]/modul2/petshop”. Selanjutnya program harus bisa membedakan file dan folder sehingga dapat memproses file yang seharusnya dikerjakan dan menghapus folder-folder yang tidak dibutuhkan.
+
+Pertama adalah inisisasi fungsi dan variabel string yang digunakan
+```c
+void fungsia();
+void fungsiLanjutan();
+void delSubStr(char *str, char *substr);
+void folderMaker(char jenis[20], char path[]);
+void movePhoto(char *namaFile, char jenis[20], char nama[20], char path[]);
+void addKet(char jenis[20], char nama[20], char umur[10], char path[]);
+void hapus(char *name, char path[]);
+```
 
 
 
