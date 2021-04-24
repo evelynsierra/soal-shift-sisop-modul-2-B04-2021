@@ -335,11 +335,141 @@ void hapus(char *name, char path[]);
 
 
 ## Soal 3
+Pada soal no.3, diketahui bahwa kita harus membuat program C yang dimana setiap 40 detik membuat folder dengan format sesuai timestamp `[YYYY-mm-dd_HH:ii:ss]`. 
 
+Berikut merupakan syntax untuk mendapatkan format timestamp
+```c
+ pid_t make_dir_child_id;
+        int status;
 
+        char tanggal[100];
+        time_t now = time(NULL);
+        struct tm *t = localtime(&now);
+        strftime(tanggal, sizeof(tanggal) - 1, "%Y-%m-%d_%H:%M:%S", t);
+
+        make_dir_child_id = fork();     
+```
+berikut merupakan syntax untuk membuat directory dengan nama folder timestamp
+```c
+if (make_dir_child_id < 0) {
+            exit(EXIT_FAILURE);
+        }
+
+        if (make_dir_child_id == 0) {
+            char *argv[3] = {"mkdir", tanggal, NULL};
+            execv("/bin/mkdir", argv);
+        }
+```
+
+Selanjutnya, di dalam folder tersebut terdapat 10 gambar yang di download dari link `https://picsum.photos/`, ketentuan gambar yang didownload harus mengikuti ukuran `(n%1000) + 50 pixel`, dimana n adalah detik Epoch Unix. 
+Gunakan looping untuk mendownload 10 gambar, setiap gambar berselang waktu 5 detik untuk di download
+```c
+for (int i = 0; i < 10; i++)
+            {
+                pid_t download_picture_child_id = fork();
+
+                if (download_picture_child_id < 0)
+                    exit(EXIT_FAILURE);
+
+                if (download_picture_child_id == 0) {
+                    unsigned long get_time = (unsigned long)time(NULL);
+                    get_time = (get_time % 1000) + 50;
+```
+
+Setelah mendapatkan nilai Epoch Unix, masukkan ke link `https://picsum.photos/` dan diberi sleep 5 detik.
+```c
+                    char link[50];
+                    sprintf(link, "https://picsum.photos/%lu", get_time);
+
+                    time_t filet;
+                    struct tm *fileti;
+                    char files[50] = "";
+                    char down_dir[100];
+
+                    filet = time(0);
+                    //  time (&filet);
+                    fileti = localtime(&filet);
+
+                    strftime(files, sizeof(files) - 1, "%Y-%m-%d_%H:%M:%S", fileti);
+                    sprintf(down_dir, "%s/%s", tanggal, files);
+
+                    // printf("%s\n", down_dir);
+                    char *argv[] = {"wget", "-q", "-O", down_dir, link, NULL};
+                    execv("/usr/local/bin/wget", argv);
+                }
+
+                sleep(5);
+            }
+```
+Setelah download 10 foto, akan dimasukkan file `status.txt` yang isinya adalah tulisan `Download Success` yang sudah dienkripsi menggunakan Caesar Cipher.
+
+```c
+char kata[50] = "Download Success";
+            char word;
+
+            //Caesar Cipher
+            for (int i = 0; i < strlen(kata); i++) {
+                word = kata[i];
+                if (word == ' ') {
+                    continue;
+                }
+                if (word >= 'a' && word <= 'z') {
+                    word += 5;
+
+                    if (word > 'z') {
+                        word = word - 'z' + 'a' - 1;
+                    }
+                    kata[i] = word;
+                } else if (word >= 'A' && word <= 'Z') {
+                    word += 5;
+                    if (word > 'Z') {
+                        word = word - 'Z' + 'A' - 1;
+                    }
+                    kata[i] = word;
+                }
+            }
+```
+Setelah kata `Download Success` telah dienkripsi, maka dimasukkan ke dalam folder dan di zip
+```c
+ char file_location[100];
+            sprintf(file_location, "%s/status.txt", tanggal);
+            FILE *status = fopen(file_location, "w");
+            fputs(kata, status);
+            fclose(status);
+
+            //Zip file
+            char zip_name[100];
+            sprintf(zip_name, "%s.zip", tanggal);
+
+            char *argv[] = {"zip", zip_name, "-rm", tanggal, NULL};
+            execv("/usr/bin/zip", argv);
+```
+dan diberi `sleep(40)` agar jarak interval waktu antar folder 40 detik.
+
+Untuk mempermudah pengendalian program, dibutuhkan program killer. Program killer tersebut nantinya harus merupakan program bash. Program utama ini nantinya akan dijalankan dalam 2 mode, yaitu `-z` dan `-x`. 
+```c
+ pid_t main_process_id = getpid();
+
+     if (argc == 2) {
+        FILE *kills = fopen("kill.sh", "w");
+
+        if (!strcmp(argv[1], "-z")) {
+            fprintf(kills, "#!/bin/bash\nkillall -9 soal3\nrm $0\n");
+        } else if (!strcmp(argv[1], "-x")) {
+            fprintf(kills, "#!/bin/bash\nkillall -9 %d\nrm $0\n",main_process_id);
+        }
+        //fprintf(kills, "rm -f kill.sh");
+
+        fclose(kills);
+    }
+```
+Jika menjalankan perintah `-z` maka program utama akan menghentikan seluruh operasinya, menggunakan syntax `killall -9 soal3`. Untuk syntax `rm $0` adalah untuk menghilangkan file killernya.
+Sedangkan untuk perintah `-x`, program akan berhenti apabila telah menjalankan proses di direktori sampai selesai. Di dalam file killernya menggunakan syntax `killall -9 getpid()`. Menggunakan `getpid()` untuk mendapatkan proses yang sedang berjalan untuk di kill.
 
 ## Kendala :
 - Mengecek program daemon agak susah karena berjalan pada background sehingga tidak memunculkan pesan error dan terkadang membuat terminal menjadi error dan operating sistem juga menjadi stuck
-- 
+- Memunculkan file kill.sh agak susah karena menyesuaikan dengan argumennya
+- Jika membuat ingin menggunakan wget, harus memperhatikan path wget nya
+- getpid() harus disesuaikan karena bisa salah mengambil pid
 
 
