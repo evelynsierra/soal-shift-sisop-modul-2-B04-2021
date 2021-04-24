@@ -1,32 +1,52 @@
-#include <dirent.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <syslog.h>
-#include <time.h>
+#include <fcntl.h>
+#include <errno.h>
 #include <unistd.h>
+#include <syslog.h>
+#include <string.h>
+#include <time.h>
+#include <sys/wait.h>
+#include <signal.h>
 
-int main(int argc, char *argv[]) {
-    pid_t main_process_id = getpid(),
-          session_id = getsid(main_process_id);
+int mysignal = 1;
 
-    if (argc == 2) {
-        FILE *kills = fopen("kill.sh", "w");
+void custom_signal_x(int signum) {
+    mysignal = 0 ;
+}
 
+void make_program(char b[]) {
+    FILE* src = fopen("killer.sh", "w") ;
+    fputs(b, src) ;
+    fclose(src) ;
+}
+
+int main(int argc, char** argv) {
+    if (argc > 2) {
+        printf("insert only -z and -x\n");
+        return 0 ;
+    }
+    else if (argc == 2) {
+        char b[80] ;
         if (!strcmp(argv[1], "-z")) {
-            fprintf(kills, "#!/bin/bash\npkill -s %d\n", session_id);
-        } else if (!strcmp(argv[1], "-x")) {
-            fprintf(kills, "#!/bin/bash\nkill -SIGTERM %d\n\n", main_process_id);
+            strcpy(b, "#!/bin/bash\nkillall -9 soal3\nrm $0\n") ;
+            make_program(b) ;
         }
-        fprintf(kills, "rm -f kill.sh");
-
-        fclose(kills);
+        else if (!strcmp(argv[1], "-x")) {
+            strcpy(b, "#!/bin/bash\nkillall -15 ./soal3\nrm $0\n") ;
+            make_program(b) ;
+            signal(SIGTERM, custom_signal_x) ;
+        }
+        else {
+            printf("insert only -z and -x\n");
+            return 0 ;
+        }
+    }
+    else {
+        printf("insert only -z and -x\n");
+        return 0 ;
     }
 
     while (1) {
@@ -86,7 +106,7 @@ int main(int argc, char *argv[]) {
 
                     // printf("%s\n", down_dir);
                     char *argv[] = {"wget", "-q", "-O", down_dir, link, NULL};
-                    execv("/bin/wget", argv);
+                    execv("/usr/local/bin/wget", argv);
                 }
 
                 sleep(5);
@@ -133,7 +153,7 @@ int main(int argc, char *argv[]) {
             sprintf(zip_name, "%s.zip", tanggal);
 
             char *argv[] = {"zip", zip_name, "-rm", tanggal, NULL};
-            execv("/bin/zip", argv);
+            execv("/usr/bin/zip", argv);
         }
 
         sleep(40);
