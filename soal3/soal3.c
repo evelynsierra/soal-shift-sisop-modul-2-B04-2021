@@ -11,42 +11,22 @@
 #include <sys/wait.h>
 #include <signal.h>
 
-int mysignal = 1;
-
-void custom_signal_x(int signum) {
-    mysignal = 0 ;
-}
-
-void make_program(char b[]) {
-    FILE* src = fopen("killer.sh", "w") ;
-    fputs(b, src) ;
-    fclose(src) ;
-}
 
 int main(int argc, char** argv) {
-    if (argc > 2) {
-        printf("insert only -z and -x\n");
-        return 0 ;
-    }
-    else if (argc == 2) {
-        char b[80] ;
+     pid_t main_process_id = getpid();
+         // session_id = getsid(main_process_id);
+
+     if (argc == 2) {
+        FILE *kills = fopen("kill.sh", "w");
+
         if (!strcmp(argv[1], "-z")) {
-            strcpy(b, "#!/bin/bash\nkillall -9 soal3\nrm $0\n") ;
-            make_program(b) ;
+            fprintf(kills, "#!/bin/bash\nkillall -9 soal3\nrm $0\n");
+        } else if (!strcmp(argv[1], "-x")) {
+            fprintf(kills, "#!/bin/bash\nkillall -9 %d\nrm $0\n",main_process_id);
         }
-        else if (!strcmp(argv[1], "-x")) {
-            strcpy(b, "#!/bin/bash\nkillall -15 ./soal3\nrm $0\n") ;
-            make_program(b) ;
-            signal(SIGTERM, custom_signal_x) ;
-        }
-        else {
-            printf("insert only -z and -x\n");
-            return 0 ;
-        }
-    }
-    else {
-        printf("insert only -z and -x\n");
-        return 0 ;
+        //fprintf(kills, "rm -f kill.sh");
+
+        fclose(kills);
     }
 
     while (1) {
