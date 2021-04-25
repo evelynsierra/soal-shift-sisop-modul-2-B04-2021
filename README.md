@@ -331,7 +331,212 @@ void movePhoto(char *namaFile, char jenis[20], char nama[20], char path[]);
 void addKet(char jenis[20], char nama[20], char umur[10], char path[]);
 void hapus(char *name, char path[]);
 ```
+Pada fungsi main berikut terdapat fungsi untuk mengextract file pets.zip yang sudah diunduh kedalam “/home/[user]/modul2/petshop”
+```c
+int main() 
+{
+	pid_t child_id;
+	int status;
+	child_id = fork();
+    
+	if (child_id < 0) 
+    {
+    	exit(EXIT_FAILURE);
+  	}
+  	  if (child_id == 0)
+      {
+      	pid_t ch = fork();
+      	int st;
+      	if(ch<0){
+          	exit(EXIT_FAILURE);
+    	}
+    	if(ch==0)
+        {
+        	char *argv[] = {"mkdir", "-p", "/Users/didofabianfayed/Documents/modul2/petshop", NULL};
+        	execv("usr/bin/mkdir", argv);
+    	}
+    	else 
+        {
+        	while ((wait(&st)) > 0);
+        	fungsia(); //unzip + hapus folder
+    	}
+  	}
+	else 
+    {
+    	while((wait(&status)) > 0);
+    	fungsiLanjutan();
+  	}
+}
+```
+`if (child_id < 0)` terdapat 3 kondisi pada 
+Pada kondisi `if(ch==0)` program akan membuat deriktori baru petshop dengan menggunakan `mkdir`. Direktori tujuan "/Users/didofabianfayed/Documents/modul2/petshop". 
+Dan pada fungsi `else` akan memanggil fungsi `fungsiLanjutan` akan memanggil fungsi `fungsia` untuk meng-extract dan menghapus folder yang tidak diperlukan.
 
+Didalam `fungsia` ini akan dilakukan extract zip pets.zip ke dalam folder petshop 
+```c
+if(ch2==0) 
+        {
+        	char *argv[] = {"unzip","-q","/Users/didofabianfayed/Documents/Praktikum M2/pets.zip","-d","/Users/didofabianfayed/Documents/modul2/petshop",NULL};
+        	execv("/usr/bin/unzip",argv);
+```
+Yang selanjutnya `find` akan mencari file bertipe direktori (`d`) terlebih dahulu lalu kemudian menghapusnya `rm` `-r`
+```c
+else 
+        {
+        	while ((wait(&status2)) > 0);
+        	char *argv[] = {"find", "/Users/didofabianfayed/Documents/modul2/petshop/.","-type","d", "-exec", "rm", "-r","{}",";",NULL};
+        	execv("/usr/bin/find", argv);
+```
+Fungsi `fungsiLanjutan` yang dipanggil di fungsi main, akan menjalankan program untuk menyelasaikan soal b, c, d dan e.
+Pada `fungsiLanjutan` akan dilakukan perulangan untuk membaca path dari direktori petshop 
+```c
+while ((ep = readdir (dp)))
+        {
+        	if(strcmp(ep->d_name, ".") !=0 && strcmp(ep->d_name, "..") !=0)
+            {
+            	char namafile[1000];
+            	strcpy(namafile, ep->d_name);
+
+            	delSubStr(namafile, ".jpg");
+              
+              char jenis[20];
+            	char nama[20];
+            	char umur[10];
+```
+`strcpy(namafile, ep->d_name);` fungsi ini digunakan untuk memasukkan nama file kedalam variabel `namafile`.
+Fungsi `delSubStr` digunakan untuk menghapus nama foto, dengan menghapus nama formatnya saja (.jpg) dan menyisakan nama filenya. 
+
+Selanjutnya adalah fungsi untuk split nama file. Dengan menggunakan `strtok` akan mengabaikan  "_ dan ;" pada penamaan file di folder petshop.
+```c
+            	char *split;
+            	split = strtok(namafile, "_;");
+```
+```c
+            	int flag = 0;
+            	while(split != NULL) {
+                	if(flag==0 | flag==3) {
+                    	strcpy(jenis, split); 
+                     	folderMaker(jenis, path);
+                	}
+```
+`flag =0 dan flag=3` sebagai flg jenis hewan peliharaan
+ketika flag==0 atau flag==1 akan memasukkan jenis heewan ke variabel `jenis` 
+Akan memanggil fungsi `folderMaker` yang nantinya digunakan untuk membuat folder. 
+Folder akan dibuat sesuai dengan jenis hewan peliharaan.
+```c
+void folderMaker(char jenis[20], char path[])
+{
+	char namaFolder[200]="";
+	strcpy(namaFolder, path);
+	strcat(jenis, "/");
+	strcat(namaFolder, jenis);
+    
+	pid_t child_id = fork();
+	int status;
+
+	if (child_id < 0) {
+      	exit(EXIT_FAILURE);
+	}
+
+	if (child_id == 0) {
+   	char *argv[] = {"mkdir", "-p", namaFolder, NULL};
+   	execv("/bin/mkdir", argv);
+	}
+	else {
+    	while((wait(&status)) > 0);
+    	return;
+	}
+}
+```
+Lalu `flag =1 dan flag=4` sebagai flg nama hewan peliharaan
+Ketika flag 1 atau 4 maka akan memasukkan nama peliharaan ke variable `nama`.
+
+```c
+                	if(flag==1 | flag==4) {
+                     	strcpy(nama, split); 
+                     	movePhoto(ep->d_name, jenis, nama, path);
+                   	}
+```
+Akan dipanggil fungsi `movePhoto` yang digunakan untuk memindahkan foto sesuai dengan kategorinya, yaitu nama, jenis, dan umur hewan peliharaan.
+```c
+void movePhoto(char *namaFile, char jenis[20], char nama[20], char path[])
+{
+	char asli[100]="";
+	strcat(asli, path);
+	strcat(asli, namaFile);
+
+	//nentuin path yg baru + ganti nama
+	char baru[100]="";
+	strcat(baru, path);
+	strcat(baru, jenis);
+	strcat(baru, "/");
+	strcat(baru, nama);
+	strcat(baru, ".jpg");
+    
+	pid_t child_id = fork();
+	int status;
+
+	if (child_id < 0) 
+    {
+  	exit(EXIT_FAILURE);
+	}
+
+	if (child_id == 0) 
+    {
+   	char *argv[] = {"cp", asli, baru, NULL};
+   	execv("/bin/cp", argv);
+	}
+	else 
+    {
+    	while((wait(&status)) > 0);
+    	return;
+	}
+}
+```
+file akan di copy (`cp`) ke path yang baru, hal ini dilakukan karena ada daftar file yang mengadung lebih dari 1 hewan dalam 1 foto yang sama.
+
+Selanjutnya `flag =2 dan flag=5` sebagai flg umur hewan peliharaan
+Ketika flag 2 atau 5 maka akan memasukkan umur peliharaan ke variable `umur`.
+Akan memanggil fungsi `addKet` yang digunakan untuk menambahkan folder keterangan pada setiap folder jenis hewan.
+```c
+                   	if(flag==2 | flag==5) {
+                     	strcpy(umur, split); 
+                     	addKet(jenis, nama, umur, path);
+                   	}
+                   	split = strtok(NULL, "_;");
+                   	flag++;
+            	}
+```
+Fungsi `addKet` akan menentukan path keterangan.txt lalu akan membuka filenya apabila belum dibuat. File ini akan berisi keterangan nama dan umur hewan peliharaan.
+```c
+void addKet(char jenis[20], char nama[20], char umur[10], char path[])
+{
+	FILE *fp;
+	char pathket[100] = "";
+
+	strcat(pathket, path);
+	strcat(pathket, jenis);
+	strcat(pathket, "/keterangan.txt");
+
+	fp = fopen (pathket, "a");
+	fprintf(fp, "nama: %s\numur: %s tahun\n\n", nama, umur);
+	fclose(fp);
+	return;
+}
+```
+
+Selanjutnya pada `fungsiLanjutan` aka memangggil fungsi `hapus` untuk menghapus file asli dalam folder petshop karena pada fungsi `movePhoto` file sudah diduplikat ke path yang baru.
+```c
+            	hapus(ep->d_name,path);
+        	}
+      	}
+```
+Terakhir ditutup dengan fungsi `closedir` untuk menutup direktori. 
+```c
+      	(void) closedir (dp);
+	} else perror ("Couldn't open the directory");
+}
+```
 
 
 ## Soal 3
